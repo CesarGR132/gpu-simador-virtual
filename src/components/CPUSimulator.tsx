@@ -4,14 +4,13 @@ import { ALU } from "./CPU/ALU";
 import { RAM } from "./CPU/RAM";
 import { Controls } from "./CPU/Controls";
 import { toast } from "sonner";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
-const initialInstructions = [
-  { address: 0, instruction: "NOP" },
-  { address: 2, instruction: "ADD 4" },
-  { address: 4, instruction: "SUB 2" },
-  { address: 6, instruction: "MUL 3" },
-  { address: 8, instruction: "DIV 2" },
-];
+interface Instruction {
+  address: number;
+  instruction: string;
+}
 
 export const CPUSimulator: React.FC = () => {
   const [pc, setPC] = useState(0);
@@ -21,6 +20,11 @@ export const CPUSimulator: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(5);
   const [aluValues, setALUValues] = useState({ value1: 0, value2: 0 });
+  const [instructions, setInstructions] = useState<Instruction[]>([
+    { address: 0, instruction: "NOP" },
+  ]);
+  const [newInstruction, setNewInstruction] = useState("");
+  const [newValue, setNewValue] = useState("");
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -31,10 +35,10 @@ export const CPUSimulator: React.FC = () => {
   }, [isRunning, speed, pc]);
 
   const executeStep = () => {
-    const instruction = initialInstructions.find((i) => i.address === pc);
+    const instruction = instructions.find((i) => i.address === pc);
     if (!instruction) {
       setIsRunning(false);
-      toast.error("End of program reached");
+      toast.error("Fin del programa alcanzado");
       return;
     }
 
@@ -57,7 +61,7 @@ export const CPUSimulator: React.FC = () => {
         break;
       case "DIV":
         if (numValue === 0) {
-          toast.error("Division by zero!");
+          toast.error("¡División por cero!");
           setIsRunning(false);
           return;
         }
@@ -76,7 +80,30 @@ export const CPUSimulator: React.FC = () => {
     setSW({ Z: false, N: false });
     setIsRunning(false);
     setALUValues({ value1: 0, value2: 0 });
-    toast.success("CPU Reset");
+    setInstructions([{ address: 0, instruction: "NOP" }]);
+    toast.success("CPU Reiniciada");
+  };
+
+  const addInstruction = () => {
+    if (!newInstruction || !newValue) {
+      toast.error("Por favor ingresa una instrucción y un valor");
+      return;
+    }
+
+    const numValue = parseInt(newValue);
+    if (isNaN(numValue)) {
+      toast.error("El valor debe ser un número");
+      return;
+    }
+
+    const newAddress = instructions.length * 2;
+    setInstructions([
+      ...instructions,
+      { address: newAddress, instruction: `${newInstruction} ${numValue}` },
+    ]);
+    setNewInstruction("");
+    setNewValue("");
+    toast.success("Instrucción agregada");
   };
 
   return (
@@ -96,9 +123,35 @@ export const CPUSimulator: React.FC = () => {
               </div>
             </div>
             <ALU {...aluValues} />
-            <RAM instructions={initialInstructions} currentAddress={pc} />
+            <RAM instructions={instructions} currentAddress={pc} />
           </div>
         </div>
+
+        <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
+          <h3 className="text-lg font-bold">Agregar Instrucción</h3>
+          <div className="flex gap-4">
+            <select
+              className="border rounded p-2"
+              value={newInstruction}
+              onChange={(e) => setNewInstruction(e.target.value)}
+            >
+              <option value="">Seleccionar operación</option>
+              <option value="ADD">ADD</option>
+              <option value="SUB">SUB</option>
+              <option value="MUL">MUL</option>
+              <option value="DIV">DIV</option>
+            </select>
+            <Input
+              type="number"
+              placeholder="Valor"
+              value={newValue}
+              onChange={(e) => setNewValue(e.target.value)}
+              className="w-32"
+            />
+            <Button onClick={addInstruction}>Agregar</Button>
+          </div>
+        </div>
+
         <Controls
           isRunning={isRunning}
           speed={speed}

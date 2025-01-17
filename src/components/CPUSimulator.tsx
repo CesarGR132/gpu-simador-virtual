@@ -215,31 +215,30 @@ export const CPUSimulator: React.FC = () => {
     <div className="container mx-auto p-8">
       <div className="space-y-8">
         <div className="bg-cpu-bg p-8 rounded-lg border border-cpu-border">
-            <div className="flex justify-between items-start">
-              <div className="space-y-8">
-                <Register name="IR" value={ir} />
-                <Register name="PC" value={pc} />
-                <Register name="ACC" value={acc} />
-                <div className="flex gap-2">
-                  <div className="text-sm font-bold">SW:</div>
-                  <div className="font-mono">
-                    Z:{sw.Z ? "1" : "0"} N:{sw.N ? "1" : "0"}
-                  </div>
+          <div className="flex justify-between items-start">
+            <div className="space-y-8">
+              <Register name="IR" value={ir} />
+              <Register name="PC" value={pc} />
+              <Register name="ACC" value={acc} />
+              <div className="flex gap-2">
+                <div className="text-sm font-bold">SW:</div>
+                <div className="font-mono">
+                  Z:{sw.Z ? "1" : "0"} N:{sw.N ? "1" : "0"}
                 </div>
               </div>
-              
-              <div className="flex gap-8 items-center">
-                <MUX inputs={muxAInput} selector={muxSelector} label="MUX A" />
-                <ALU {...aluValues} />
-                <MUX inputs={muxBInput} selector={muxSelector} label="MUX B" />
-              </div>
-              
-              <RAM instructions={instructions} currentAddress={pc} />
             </div>
             
-            <div className="flex justify-center">
-              <ControlUnit instruction={ir} signals={controlSignals} />
+            <div className="flex gap-8 items-center">
+              <MUX inputs={muxAInput} selector={muxSelector} label="MUX A" />
+              <ALU {...aluValues} />
+              <MUX inputs={muxBInput} selector={muxSelector} label="MUX B" />
             </div>
+            
+            <RAM instructions={instructions} currentAddress={pc} />
+          </div>
+          
+          <div className="flex justify-center">
+            <ControlUnit instruction={ir} signals={controlSignals} />
           </div>
         </div>
 

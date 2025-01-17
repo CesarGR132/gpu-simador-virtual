@@ -3,6 +3,8 @@ import { Register } from "./CPU/Register";
 import { ALU } from "./CPU/ALU";
 import { RAM } from "./CPU/RAM";
 import { Controls } from "./CPU/Controls";
+import { ControlUnit } from "./CPU/ControlUnit";
+import { MUX } from "./CPU/MUX";
 import { toast } from "sonner";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -19,12 +21,28 @@ export const CPUSimulator: React.FC = () => {
   const [sw, setSW] = useState({ Z: false, N: false });
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(5);
-  const [aluValues, setALUValues] = useState({ value1: 0, value2: 0 });
+  const [aluValues, setALUValues] = useState({ 
+    value1: 0, 
+    value2: 0, 
+    operation: "ADD",
+    result: 0,
+    zero: false 
+  });
+  const [controlSignals, setControlSignals] = useState({
+    aluOp: "ADD",
+    memRead: false,
+    memWrite: false,
+    regWrite: false,
+    branch: false
+  });
   const [instructions, setInstructions] = useState<Instruction[]>([
     { address: 0, instruction: "NOP" },
   ]);
   const [newInstruction, setNewInstruction] = useState("");
   const [newValue, setNewValue] = useState("");
+  const [muxAInput, setMuxAInput] = useState([0, 0]);
+  const [muxBInput, setMuxBInput] = useState([0, 0]);
+  const [muxSelector, setMuxSelector] = useState(0);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -33,6 +51,19 @@ export const CPUSimulator: React.FC = () => {
     }
     return () => clearInterval(interval);
   }, [isRunning, speed, pc]);
+
+  const updateControlSignals = (instruction: string) => {
+    const [op] = instruction.split(" ");
+    const signals = {
+      aluOp: op,
+      memRead: op === "LOAD",
+      memWrite: op === "STORE",
+      regWrite: ["ADD", "SUB", "MUL", "DIV", "LOAD"].includes(op),
+      branch: op === "BRANCH"
+    };
+    setControlSignals(signals);
+    return signals;
+  };
 
   const executeStep = () => {
     const instruction = instructions.find((i) => i.address === pc);
@@ -46,30 +77,48 @@ export const CPUSimulator: React.FC = () => {
     const [op, value] = instruction.instruction.split(" ");
     const numValue = parseInt(value || "0");
 
+    // Update control signals
+    const signals = updateControlSignals(instruction.instruction);
+    
+    // Update MUX inputs
+    setMuxAInput([acc, numValue]);
+    setMuxBInput([numValue, acc]);
+    setMuxSelector(signals.memRead ? 1 : 0);
+
+    // Update ALU values
+    const value1 = muxAInput[muxSelector];
+    const value2 = muxBInput[muxSelector];
+    let result = 0;
+
     switch (op) {
       case "ADD":
-        setALUValues({ value1: acc, value2: numValue });
-        setACC(acc + numValue);
+        result = value1 + value2;
         break;
       case "SUB":
-        setALUValues({ value1: acc, value2: numValue });
-        setACC(acc - numValue);
+        result = value1 - value2;
         break;
       case "MUL":
-        setALUValues({ value1: acc, value2: numValue });
-        setACC(acc * numValue);
+        result = value1 * value2;
         break;
       case "DIV":
-        if (numValue === 0) {
+        if (value2 === 0) {
           toast.error("¡División por cero!");
           setIsRunning(false);
           return;
         }
-        setALUValues({ value1: acc, value2: numValue });
-        setACC(Math.floor(acc / numValue));
+        result = Math.floor(value1 / value2);
         break;
     }
 
+    setALUValues({
+      value1,
+      value2,
+      operation: op,
+      result,
+      zero: result === 0
+    });
+    setACC(result);
+    setSW({ Z: result === 0, N: result < 0 });
     setPC(pc + 2);
   };
 
@@ -79,8 +128,24 @@ export const CPUSimulator: React.FC = () => {
     setACC(0);
     setSW({ Z: false, N: false });
     setIsRunning(false);
-    setALUValues({ value1: 0, value2: 0 });
+    setALUValues({ 
+      value1: 0, 
+      value2: 0, 
+      operation: "ADD",
+      result: 0,
+      zero: false 
+    });
+    setControlSignals({
+      aluOp: "ADD",
+      memRead: false,
+      memWrite: false,
+      regWrite: false,
+      branch: false
+    });
     setInstructions([{ address: 0, instruction: "NOP" }]);
+    setMuxAInput([0, 0]);
+    setMuxBInput([0, 0]);
+    setMuxSelector(0);
     toast.success("CPU Reiniciada");
   };
 
@@ -110,20 +175,32 @@ export const CPUSimulator: React.FC = () => {
     <div className="container mx-auto p-8">
       <div className="space-y-8">
         <div className="bg-cpu-bg p-8 rounded-lg border border-cpu-border">
-          <div className="flex justify-between items-start">
-            <div className="space-y-8">
-              <Register name="IR" value={ir} />
-              <Register name="PC" value={pc} />
-              <Register name="ACC" value={acc} />
-              <div className="flex gap-2">
-                <div className="text-sm font-bold">SW:</div>
-                <div className="font-mono">
-                  Z:{sw.Z ? "1" : "0"} N:{sw.N ? "1" : "0"}
+          <div className="flex flex-col gap-8">
+            <div className="flex justify-between items-start">
+              <div className="space-y-8">
+                <Register name="IR" value={ir} />
+                <Register name="PC" value={pc} />
+                <Register name="ACC" value={acc} />
+                <div className="flex gap-2">
+                  <div className="text-sm font-bold">SW:</div>
+                  <div className="font-mono">
+                    Z:{sw.Z ? "1" : "0"} N:{sw.N ? "1" : "0"}
+                  </div>
                 </div>
               </div>
+              
+              <div className="flex gap-8 items-center">
+                <MUX inputs={muxAInput} selector={muxSelector} label="MUX A" />
+                <ALU {...aluValues} />
+                <MUX inputs={muxBInput} selector={muxSelector} label="MUX B" />
+              </div>
+              
+              <RAM instructions={instructions} currentAddress={pc} />
             </div>
-            <ALU {...aluValues} />
-            <RAM instructions={instructions} currentAddress={pc} />
+            
+            <div className="flex justify-center">
+              <ControlUnit instruction={ir} signals={controlSignals} />
+            </div>
           </div>
         </div>
 

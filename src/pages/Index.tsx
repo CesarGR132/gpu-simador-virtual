@@ -1,24 +1,43 @@
 import { CPUSimulator } from "@/components/CPUSimulator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const Index = () => {
+  const { theme, setTheme } = useTheme();
+
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-background transition-colors duration-300 py-8">
       <div className="container mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">CPU Simulator</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-center">CPU Simulator</h1>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
         
         <Tabs defaultValue="simulator" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="simulator">Simulador</TabsTrigger>
             <TabsTrigger value="documentation">Documentación</TabsTrigger>
+            <TabsTrigger value="github">GitHub</TabsTrigger>
           </TabsList>
           
           <TabsContent value="simulator">
             <CPUSimulator />
           </TabsContent>
           
-          <TabsContent value="documentation" className="bg-white p-8 rounded-lg">
-            <div className="prose max-w-none">
+          <TabsContent value="documentation" className="bg-card p-8 rounded-lg">
+            <div className="prose dark:prose-invert max-w-none">
               <h2 className="text-2xl font-bold mb-4">Documentación del Simulador de CPU</h2>
               
               <h3 className="text-xl font-semibold mt-6">Componentes Principales</h3>
@@ -79,6 +98,62 @@ const Index = () => {
                 <li>Controle la ejecución con los botones de control</li>
                 <li>Observe el flujo de datos entre componentes durante la ejecución</li>
               </ol>
+
+              <h4 className="font-semibold mt-4">Buses del CPU</h4>
+              <p>El simulador incluye los siguientes buses:</p>
+              <ul>
+                <li><strong>Bus de Datos:</strong> Transfiere datos entre componentes (color azul)</li>
+                <li><strong>Bus de Direcciones:</strong> Transporta direcciones de memoria (color naranja)</li>
+                <li><strong>Bus de Control:</strong> Lleva señales de control (color rojo)</li>
+              </ul>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="github" className="bg-card p-8 rounded-lg">
+            <div className="prose dark:prose-invert max-w-none">
+              <h2 className="text-2xl font-bold mb-4">Descarga y Ejecución Local</h2>
+              
+              <h3 className="text-xl font-semibold mt-6">Requisitos Previos</h3>
+              <ul>
+                <li>Node.js (versión 14 o superior)</li>
+                <li>npm (incluido con Node.js)</li>
+                <li>Git instalado en tu sistema</li>
+              </ul>
+
+              <h3 className="text-xl font-semibold mt-6">Pasos para Instalación</h3>
+              <ol>
+                <li>
+                  <p>Clonar el repositorio:</p>
+                  <pre className="bg-muted p-4 rounded-md">
+                    <code>git clone [URL_DEL_REPOSITORIO]</code>
+                  </pre>
+                </li>
+                <li>
+                  <p>Navegar al directorio del proyecto:</p>
+                  <pre className="bg-muted p-4 rounded-md">
+                    <code>cd [NOMBRE_DEL_PROYECTO]</code>
+                  </pre>
+                </li>
+                <li>
+                  <p>Instalar dependencias:</p>
+                  <pre className="bg-muted p-4 rounded-md">
+                    <code>npm install</code>
+                  </pre>
+                </li>
+                <li>
+                  <p>Iniciar el servidor de desarrollo:</p>
+                  <pre className="bg-muted p-4 rounded-md">
+                    <code>npm run dev</code>
+                  </pre>
+                </li>
+              </ol>
+
+              <h3 className="text-xl font-semibold mt-6">Notas Importantes</h3>
+              <ul>
+                <li>El servidor de desarrollo se ejecutará en <code>http://localhost:5173</code> por defecto</li>
+                <li>Los cambios en el código se reflejarán automáticamente en el navegador</li>
+                <li>Para construir la versión de producción, usa <code>npm run build</code></li>
+              </ul>
             </div>
           </TabsContent>
         </Tabs>

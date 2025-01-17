@@ -53,14 +53,14 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         cpu: {
-          bg: "#e2e2e2",
-          border: "#a0a0a0",
-          text: "#333333",
+          bg: "hsl(var(--cpu-bg))",
+          border: "hsl(var(--cpu-border))",
+          text: "hsl(var(--cpu-text))",
         },
         bus: {
-          data: "#0066cc",
-          address: "#ff9900",
-          control: "#cc0000",
+          data: "hsl(var(--bus-data))",
+          address: "hsl(var(--bus-address))",
+          control: "hsl(var(--bus-control))",
         },
       },
       animation: {
@@ -79,5 +79,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;

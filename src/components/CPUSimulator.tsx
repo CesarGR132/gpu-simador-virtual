@@ -8,6 +8,7 @@ import { MUX } from "./CPU/MUX";
 import { toast } from "sonner";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { Dice6 } from "lucide-react";
 
 interface Instruction {
   address: number;
@@ -43,6 +44,45 @@ export const CPUSimulator: React.FC = () => {
   const [muxAInput, setMuxAInput] = useState([0, 0]);
   const [muxBInput, setMuxBInput] = useState([0, 0]);
   const [muxSelector, setMuxSelector] = useState(0);
+
+  const generateRandomInstructions = () => {
+    const operations = ["ADD", "SUB", "MUL", "DIV"];
+    const numInstructions = Math.floor(Math.random() * 5) + 3; // Generate 3-7 instructions
+    const newInstructions: Instruction[] = [];
+
+    for (let i = 0; i < numInstructions; i++) {
+      const operation = operations[Math.floor(Math.random() * operations.length)];
+      let value: number;
+
+      // Generate meaningful values based on operation
+      switch (operation) {
+        case "ADD":
+        case "SUB":
+          value = Math.floor(Math.random() * 100); // 0-99
+          break;
+        case "MUL":
+          value = Math.floor(Math.random() * 10) + 1; // 1-10 for multiplication
+          break;
+        case "DIV":
+          value = Math.floor(Math.random() * 9) + 2; // 2-10 to avoid division by 1 or 0
+          break;
+        default:
+          value = 0;
+      }
+
+      newInstructions.push({
+        address: i * 2,
+        instruction: `${operation} ${value}`
+      });
+    }
+
+    setInstructions(newInstructions);
+    setPC(0);
+    setACC(0);
+    setSW({ Z: false, N: false });
+    setIsRunning(false);
+    toast.success(`Generated ${numInstructions} random instructions`);
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -175,7 +215,6 @@ export const CPUSimulator: React.FC = () => {
     <div className="container mx-auto p-8">
       <div className="space-y-8">
         <div className="bg-cpu-bg p-8 rounded-lg border border-cpu-border">
-          <div className="flex flex-col gap-8">
             <div className="flex justify-between items-start">
               <div className="space-y-8">
                 <Register name="IR" value={ir} />
@@ -205,7 +244,17 @@ export const CPUSimulator: React.FC = () => {
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
-          <h3 className="text-lg font-bold">Agregar Instrucción</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold">Agregar Instrucción</h3>
+            <Button
+              variant="outline"
+              onClick={generateRandomInstructions}
+              className="gap-2"
+            >
+              <Dice6 className="h-4 w-4" />
+              Generar Instrucciones Aleatorias
+            </Button>
+          </div>
           <div className="flex gap-4">
             <select
               className="border rounded p-2"

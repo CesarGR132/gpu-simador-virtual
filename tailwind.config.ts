@@ -57,20 +57,6 @@ export default {
           border: "hsl(var(--cpu-border))",
           text: "hsl(var(--cpu-text))",
         },
-        bus: {
-          data: "hsl(var(--bus-data))",
-          address: "hsl(var(--bus-address))",
-          control: "hsl(var(--bus-control))",
-        },
-      },
-      animation: {
-        "data-flow": "data-flow 1s ease-in-out",
-      },
-      keyframes: {
-        "data-flow": {
-          "0%": { strokeDashoffset: "1000" },
-          "100%": { strokeDashoffset: "0" },
-        },
       },
       borderRadius: {
         lg: "var(--radius)",

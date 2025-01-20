@@ -15,7 +15,7 @@ interface ControlUnitProps {
 
 export const ControlUnit: React.FC<ControlUnitProps> = ({ instruction, signals }) => {
   return (
-    <div className="w-48 bg-white border border-cpu-border rounded-lg p-4">
+    <div className="w-48 bg-card border border-cpu-border rounded-lg p-4 text-cpu-text">
       <div className="text-lg font-bold mb-2 text-center">Control Unit</div>
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">

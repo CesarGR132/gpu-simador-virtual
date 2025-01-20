@@ -216,7 +216,7 @@ export const CPUSimulator: React.FC = () => {
       <div className="space-y-8">
         <div className="bg-cpu-bg p-8 rounded-lg border border-cpu-border">
           <div className="flex justify-between items-start">
-            <div className="space-y-8">
+            <div className="space-y-8 text-cpu-text">
               <Register name="IR" value={ir} />
               <Register name="PC" value={pc} />
               <Register name="ACC" value={acc} />
@@ -242,7 +242,7 @@ export const CPUSimulator: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
+        <div className="bg-card p-4 rounded-lg border border-border space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold">Agregar Instrucción</h3>
             <Button

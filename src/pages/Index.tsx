@@ -9,7 +9,6 @@ const Index = () => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Only show the theme toggle after mounting to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -51,34 +50,65 @@ const Index = () => {
             <div className="prose dark:prose-invert max-w-none">
               <h2 className="text-2xl font-bold mb-4">Documentación del Simulador de CPU</h2>
               
-              <h3 className="text-xl font-semibold mt-6">Componentes Principales</h3>
+              <h3 className="text-xl font-semibold mt-6">¿Cómo Funciona el Simulador?</h3>
+              <p>
+                El simulador de CPU es una representación interactiva de los componentes básicos de una unidad central de procesamiento.
+                Permite visualizar y entender el funcionamiento interno de una CPU mediante la ejecución de instrucciones simples.
+              </p>
+
+              <h4 className="font-semibold mt-4">Ciclo de Ejecución</h4>
+              <ol>
+                <li>
+                  <strong>Búsqueda de Instrucción:</strong> El PC (Contador de Programa) contiene la dirección de la siguiente instrucción a ejecutar.
+                  Esta dirección se utiliza para obtener la instrucción de la memoria RAM.
+                </li>
+                <li>
+                  <strong>Decodificación:</strong> La instrucción se carga en el IR (Registro de Instrucción) y la Unidad de Control la decodifica
+                  para determinar qué operación realizar.
+                </li>
+                <li>
+                  <strong>Ejecución:</strong> La ALU (Unidad Aritmético Lógica) realiza la operación especificada con los operandos proporcionados.
+                  El resultado se almacena en el ACC (Acumulador).
+                </li>
+              </ol>
+
+              <h4 className="font-semibold mt-4">Componentes Principales</h4>
               
-              <h4 className="font-semibold mt-4">Registros</h4>
+              <h5 className="font-semibold mt-2">Registros</h5>
               <ul>
-                <li><strong>PC (Program Counter):</strong> Contador de programa que mantiene la dirección de la siguiente instrucción a ejecutar.</li>
-                <li><strong>IR (Instruction Register):</strong> Registro de instrucción que almacena la instrucción actual en ejecución.</li>
-                <li><strong>ACC (Accumulator):</strong> Acumulador que almacena resultados temporales y operandos.</li>
-                <li><strong>SW (Status Word):</strong> Palabra de estado que indica condiciones como cero (Z) y negativo (N).</li>
+                <li><strong>PC (Program Counter):</strong> Mantiene la dirección de la siguiente instrucción a ejecutar.</li>
+                <li><strong>IR (Instruction Register):</strong> Almacena la instrucción actual en ejecución.</li>
+                <li><strong>ACC (Accumulator):</strong> Almacena resultados temporales y operandos.</li>
+                <li><strong>SW (Status Word):</strong> Contiene flags que indican condiciones como:
+                  <ul>
+                    <li>Z (Zero): Se activa cuando el resultado es cero</li>
+                    <li>N (Negative): Se activa cuando el resultado es negativo</li>
+                  </ul>
+                </li>
               </ul>
 
-              <h4 className="font-semibold mt-4">ALU (Unidad Aritmético Lógica)</h4>
-              <p>Realiza operaciones aritméticas y lógicas:</p>
+              <h5 className="font-semibold mt-2">ALU (Unidad Aritmético Lógica)</h5>
+              <p>Realiza operaciones matemáticas básicas:</p>
               <ul>
                 <li><strong>ADD:</strong> Suma dos números</li>
                 <li><strong>SUB:</strong> Resta dos números</li>
                 <li><strong>MUL:</strong> Multiplica dos números</li>
-                <li><strong>DIV:</strong> División entera de dos números</li>
+                <li><strong>DIV:</strong> Realiza división entera</li>
               </ul>
 
-              <h4 className="font-semibold mt-4">MUX (Multiplexores)</h4>
-              <p>Seleccionan entre diferentes fuentes de datos:</p>
+              <h5 className="font-semibold mt-2">Multiplexores (MUX)</h5>
+              <p>
+                Los multiplexores son componentes que seleccionan entre diferentes fuentes de datos según las señales de control:
+              </p>
               <ul>
                 <li><strong>MUX A:</strong> Selecciona el primer operando para la ALU</li>
                 <li><strong>MUX B:</strong> Selecciona el segundo operando para la ALU</li>
               </ul>
 
-              <h4 className="font-semibold mt-4">Unidad de Control</h4>
-              <p>Coordina todas las operaciones del CPU mediante señales de control:</p>
+              <h5 className="font-semibold mt-2">Unidad de Control</h5>
+              <p>
+                Coordina todas las operaciones del CPU mediante señales de control:
+              </p>
               <ul>
                 <li><strong>ALU Op:</strong> Determina la operación a realizar por la ALU</li>
                 <li><strong>Mem Read:</strong> Controla la lectura de memoria</li>
@@ -87,35 +117,52 @@ const Index = () => {
                 <li><strong>Branch:</strong> Controla las operaciones de salto</li>
               </ul>
 
-              <h4 className="font-semibold mt-4">RAM (Memoria)</h4>
-              <p>Almacena el programa y los datos. Cada instrucción contiene:</p>
+              <h5 className="font-semibold mt-2">Memoria RAM</h5>
+              <p>
+                Almacena el programa y los datos. Cada instrucción contiene:
+              </p>
               <ul>
                 <li><strong>Dirección:</strong> Ubicación en memoria</li>
                 <li><strong>Instrucción:</strong> Operación a realizar y valor</li>
               </ul>
 
-              <h3 className="text-xl font-semibold mt-6">Controles del Simulador</h3>
-              <ul>
-                <li><strong>Play/Pause:</strong> Inicia o pausa la ejecución automática</li>
-                <li><strong>Step:</strong> Ejecuta una sola instrucción</li>
-                <li><strong>Reset:</strong> Reinicia el simulador</li>
-                <li><strong>Velocidad:</strong> Ajusta la velocidad de ejecución automática</li>
-              </ul>
-
-              <h3 className="text-xl font-semibold mt-6">Instrucciones de Uso</h3>
+              <h4 className="font-semibold mt-4">Uso del Simulador</h4>
               <ol>
-                <li>Agregue instrucciones usando el panel de "Agregar Instrucción"</li>
-                <li>Use el botón de generación aleatoria para crear un programa de ejemplo</li>
-                <li>Controle la ejecución con los botones de control</li>
-                <li>Observe el flujo de datos entre componentes durante la ejecución</li>
+                <li>
+                  <strong>Agregar Instrucciones:</strong>
+                  <ul>
+                    <li>Use el panel "Agregar Instrucción" para ingresar nuevas instrucciones</li>
+                    <li>Seleccione una operación (ADD, SUB, MUL, DIV)</li>
+                    <li>Ingrese un valor numérico</li>
+                    <li>Presione "Agregar" para incluir la instrucción en la memoria</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Controles de Ejecución:</strong>
+                  <ul>
+                    <li>Play/Pause: Inicia o pausa la ejecución automática</li>
+                    <li>Step: Ejecuta una sola instrucción</li>
+                    <li>Reset: Reinicia el simulador</li>
+                    <li>Control de Velocidad: Ajusta la velocidad de ejecución</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Observación:</strong>
+                  <ul>
+                    <li>Observe cómo cambian los valores en los registros</li>
+                    <li>Vea las operaciones realizadas por la ALU</li>
+                    <li>Monitoree las señales de control</li>
+                    <li>Siga el flujo de datos entre componentes</li>
+                  </ul>
+                </li>
               </ol>
 
-              <h4 className="font-semibold mt-4">Buses del CPU</h4>
-              <p>El simulador incluye los siguientes buses:</p>
+              <h4 className="font-semibold mt-4">Consejos de Uso</h4>
               <ul>
-                <li><strong>Bus de Datos:</strong> Transfiere datos entre componentes (color azul)</li>
-                <li><strong>Bus de Direcciones:</strong> Transporta direcciones de memoria (color naranja)</li>
-                <li><strong>Bus de Control:</strong> Lleva señales de control (color rojo)</li>
+                <li>Comience con programas simples de 2-3 instrucciones</li>
+                <li>Use el modo paso a paso para entender cada etapa</li>
+                <li>Observe cómo se actualizan los flags después de cada operación</li>
+                <li>Experimente con diferentes secuencias de instrucciones</li>
               </ul>
             </div>
           </TabsContent>
